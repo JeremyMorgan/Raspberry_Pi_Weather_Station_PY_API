@@ -1,0 +1,186 @@
+Web API Python
+
+### INSTALL MARIADB
+
+apt-get update
+apt-get upgrade
+
+apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
+
+nano /etc/apt/sources.list
+
+	# MariaDB 5.5 repository list
+	deb http://ftp.osuosl.org/pub/mariadb/repo/5.5/debian wheezy main
+	deb-src http://ftp.osuosl.org/pub/mariadb/repo/5.5/debian wheezy main
+
+	{{ IMAGE 01 }}
+
+apt-get install mariadb-server
+
+/usr/bin/mysql_secure_installation
+
+mysql -u root -p
+
+{{ IMAGE 02 }}
+
+nano /etc/mysql/my.cnf
+
+bind-address = 0.0.0.0
+
+service mysql restart
+
+
+### PYTHON / SQL Connection
+
+libmariadbclient-dev libssl-dev python-mysqldb
+
+dpkg -i mysql-connector-python_2.1.3-1debian7.9_all.deb
+
+
+
+####PYTHON FLASK
+
+mkdir source
+cd source
+
+apt-get install curl
+
+curl -O http://peak.telecommunity.com/dist/ez_setup.py
+
+python ez_setup.py
+
+easy_install pip
+
+pip install flask
+
+
+
+##### SETUP API
+
+adduser web
+
+su web
+
+cd ~
+
+mkdir weather-api
+
+cd weather-api
+
+http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
+
+	#!flask/bin/python
+	from flask import Flask
+
+	app = Flask(__name__)
+
+	@app.route('/')
+	def index():
+		return "Hello, World!"
+
+	if __name__ == '__main__':
+
+		app.run(debug=True)
+
+
+chmod a+x app.py
+./app.py
+
+create new session,
+
+curl 127.0.0.1:5000
+
+outside
+
+
+{{ IMAGE 3 }}
+
+	#!flask/bin/python
+	from flask import Flask, jsonify
+
+	app = Flask(__name__)
+
+	tasks = [
+		{
+			'id': 1,
+			'title': u'Buy groceries',
+			'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
+			'done': False
+		},
+		{
+			'id': 2,
+			'title': u'Learn Python',
+			'description': u'Need to find a good Python tutorial on the web',
+			'done': False
+		}
+	]
+
+	@app.route('/todo/api/v1.0/tasks', methods=['GET'])
+	def get_tasks():
+		return jsonify({'tasks': tasks})
+
+	if __name__ == '__main__':
+		app.run(host='0.0.0.0')
+
+
+{YOUR IP}/todo/api/v1.0/tasks
+
+{{ Image 04 }}
+
+for security: 
+pip install flask-httpauth
+
+
+### MARIA DB SETUP ###
+
+CREATE DATABASE weather;
+GRANT ALL PRIVILEGES ON weather.* TO web@'%' IDENTIFIED BY 'secretpassword';
+FLUSH PRIVILEGES;
+quit
+
+mysql -u web -p
+
+use weather;
+
+CREATE TABLE `weather`.`reading` (
+  `readingID` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `TempSensor1` DECIMAL(20,10) NULL COMMENT '',
+  `TempSensor2` DECIMAL(20,10) NULL COMMENT '',
+  `TempSensor3` DECIMAL(20,10) NULL COMMENT '',
+  `TempSensorAvg` DECIMAL(20,10) NULL COMMENT '',
+  `Humidity` DECIMAL(20,10) NULL COMMENT '',
+  `Pressure` DECIMAL(20,10) NULL COMMENT '',
+  `Altitude` DECIMAL(20,10) NULL COMMENT '',
+  `SeaLevelPressure` DECIMAL(20,10) NULL COMMENT '',
+  `Lux` DECIMAL(20,10) NULL COMMENT '',
+  `TimeStamp` VARCHAR(45) NULL COMMENT '',
+  PRIMARY KEY (`readingID`)  COMMENT '');
+
+curl -i -H "Content-Type: application/json" -X PUT -d '{"TempSensor1":"23"}' http://localhost:5000/weather/api/v1/readings
+
+
+curl -i -H "Content-Type: application/json" -X POST -d '{"TempSensor1":"23"}' http://localhost:5000/weather/api/v1/readings
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
