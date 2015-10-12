@@ -25,6 +25,13 @@ readings = [
 ]
 
 def getReadings(amount):
+    # This is where we will pull from:
+    #
+    # - Get readings (amount)
+    # - Get last hour
+    # - Get last day
+    # - Get last 7 days
+    #
     return readings
 
 def addReading(reading):
